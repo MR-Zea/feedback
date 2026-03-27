@@ -268,31 +268,46 @@
         window.submitFeedback = async () => {
             const user = window.currentUser;
             const btn = document.getElementById('submit-btn');
+            const messageText = document.getElementById('feedback-text').value || "Tidak ada pesan.";
             btn.innerHTML = '<div class="spinner mx-auto"></div>';
             
+            // Membuat visualisasi bintang
+            const starStr = "⭐".repeat(currentRating) + "🌑".repeat(5 - currentRating);
+
             const payload = {
+                content: "🚀 **Feedback Baru Diterima!**",
                 embeds: [{
-                    title: "Feedback Baru",
-                    color: 0x0f172a,
+                    title: "Rincian Masukan",
+                    color: 0xFBBF24, // Warna Amber
                     fields: [
-                        { name: "User", value: user.displayName, inline: true },
-                        { name: "Rating", value: "⭐".repeat(currentRating), inline: true },
-                        { name: "Kategori", value: currentCategory, inline: true },
-                        { name: "Pesan", value: document.getElementById('feedback-text').value || "-" }
-                    ]
+                        { name: "👤 Nama Pengguna", value: user.displayName, inline: true },
+                        { name: "📧 Email", value: user.email || "Email Tersembunyi", inline: true },
+                        { name: "🌟 Rating", value: `${starStr} (${currentRating}/5)`, inline: false },
+                        { name: "🏷️ Kategori", value: `\`${currentCategory}\``, inline: true },
+                        { name: "📅 Waktu", value: new Date().toLocaleString('id-ID'), inline: true },
+                        { name: "💬 Pesan", value: `\`\`\`${messageText}\`\`\``, inline: false }
+                    ],
+                    thumbnail: { url: user.photoURL },
+                    footer: { text: "Sistem Feedback Otomatis" },
+                    timestamp: new Date().toISOString()
                 }]
             };
 
             try {
-                await fetch('https://discord.com/api/webhooks/1487071889892311112/z4IuG7uHgD_FDDV6vIcv8Vsf6807ySoJrIALS7UEYYKY7hmve--jAoaFwSBhF3s8npGQ', {
+                const response = await fetch('https://discord.com/api/webhooks/1487071889892311112/z4IuG7uHgD_FDDV6vIcv8Vsf6807ySoJrIALS7UEYYKY7hmve--jAoaFwSBhF3s8npGQ', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
-                document.getElementById('step-1').classList.add('hidden');
-                document.getElementById('step-2').classList.remove('hidden');
+                
+                if (response.ok) {
+                    document.getElementById('step-1').classList.add('hidden');
+                    document.getElementById('step-2').classList.remove('hidden');
+                } else {
+                    throw new Error("Gagal mengirim ke Discord");
+                }
             } catch (e) {
-                alert("Gagal mengirim.");
+                alert("Gagal mengirim feedback. Silakan periksa koneksi Anda.");
             } finally {
                 btn.innerText = "Kirim Feedback";
             }
