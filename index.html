@@ -2,15 +2,15 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Premium Feedback UI - Compact & Multi-theme</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <title>Premium Feedback UI - Mobile Responsive</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
         
         :root {
             --bg-body: fixed linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-            --bg-card: rgba(255, 255, 255, 0.8);
+            --bg-card: rgba(255, 255, 255, 0.85);
             --text-main: #0f172a;
             --text-sub: #64748b;
             --border: rgba(255, 255, 255, 0.6);
@@ -20,7 +20,7 @@
 
         .dark {
             --bg-body: fixed linear-gradient(135deg, #0f172a 0%, #020617 100%);
-            --bg-card: rgba(30, 41, 59, 0.7);
+            --bg-card: rgba(30, 41, 59, 0.8);
             --text-main: #f8fafc;
             --text-sub: #94a3b8;
             --border: rgba(255, 255, 255, 0.1);
@@ -32,25 +32,33 @@
             background: var(--bg-body);
             transition: background 0.5s ease;
             min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+            padding: 16px;
         }
 
         .main-card {
             background: var(--bg-card);
-            backdrop-filter: blur(20px) saturate(180%);
+            backdrop-filter: blur(24px) saturate(180%);
             border: 1px solid var(--border);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
             transition: all 0.4s ease;
+            width: 100%;
+            max-width: 400px; /* Lebar maksimal desktop */
         }
 
         .star-btn {
             transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
             color: #94a3b8;
+            padding: 4px;
         }
 
         .star-btn.active {
             color: var(--accent);
             filter: drop-shadow(0 0 8px rgba(251, 191, 36, 0.5));
-            transform: scale(1.2);
+            transform: scale(1.1);
         }
 
         .category-chip {
@@ -58,6 +66,8 @@
             background: var(--input-bg);
             color: var(--text-sub);
             border: 1px solid var(--border);
+            flex: 1; /* Membagi rata lebar di mobile */
+            text-align: center;
         }
 
         .category-chip.active {
@@ -67,115 +77,126 @@
         }
 
         .theme-toggle {
-            position: absolute;
-            top: 1.5rem;
-            right: 1.5rem;
-            z-index: 50;
+            position: fixed; /* Fixed agar selalu di pojok kanan atas layar */
+            top: 1rem;
+            right: 1rem;
+            z-index: 100;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: scale(0.95); }
-            to { opacity: 1; transform: scale(1); }
+        /* Animasi */
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
-        .animate-fade-in {
-            animation: fadeIn 0.4s ease forwards;
+        .animate-slide-up {
+            animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
 
         .spinner {
-            width: 18px;
-            height: 18px;
+            width: 20px;
+            height: 20px;
             border: 2px solid rgba(255, 255, 255, 0.3);
             border-radius: 50%;
             border-top-color: white;
             animation: spin 0.8s linear infinite;
         }
         @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Handle Mobile Keyboard */
+        @media (max-height: 500px) {
+            body { align-items: flex-start; }
+            .main-card { margin-top: 40px; }
+        }
     </style>
 </head>
-<body class="flex items-center justify-center p-6">
+<body class="dark:text-white">
 
     <!-- Theme Switcher -->
-    <button onclick="toggleTheme()" class="theme-toggle p-3 rounded-full bg-white/20 backdrop-blur-md border border-white/30 text-slate-800 dark:text-white shadow-lg active:scale-90 transition-all">
-        <svg id="theme-icon-sun" class="w-5 h-5 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z"></path></svg>
-        <svg id="theme-icon-moon" class="w-5 h-5 block dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"></path></svg>
+    <button onclick="toggleTheme()" class="theme-toggle p-3 rounded-2xl bg-white/20 dark:bg-slate-800/40 backdrop-blur-xl border border-white/30 text-slate-800 dark:text-white shadow-xl active:scale-90 transition-all">
+        <svg id="theme-icon-sun" class="w-6 h-6 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z"></path></svg>
+        <svg id="theme-icon-moon" class="w-6 h-6 block dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"></path></svg>
     </button>
 
-    <div class="main-card w-full max-w-sm rounded-[2.5rem] overflow-hidden animate-fade-in">
+    <div class="main-card rounded-[2rem] overflow-hidden animate-slide-up">
         
         <!-- Auth Section -->
-        <div id="auth-section" class="px-8 py-12 text-center">
-            <div class="inline-flex items-center justify-center w-16 h-16 bg-white dark:bg-slate-800 rounded-3xl shadow-xl mb-6 border border-slate-100 dark:border-slate-700">
-                <svg class="w-8 h-8 text-slate-800 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div id="auth-section" class="px-6 py-10 text-center sm:px-10">
+            <div class="inline-flex items-center justify-center w-20 h-20 bg-white dark:bg-slate-800 rounded-3xl shadow-2xl mb-6 border border-slate-100 dark:border-slate-700">
+                <svg class="w-10 h-10 text-slate-800 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path>
                 </svg>
             </div>
-            <h2 class="text-2xl font-extrabold text-slate-900 dark:text-white mb-2">Bantu kami berkembang!</h2>
-            <p class="text-slate-500 dark:text-slate-400 text-sm mb-8">Masuk untuk memberikan saran atau melaporkan bug.</p>
+            <h2 class="text-2xl font-extrabold text-slate-900 dark:text-white mb-2 leading-tight">Halo! 👋</h2>
+            <p class="text-slate-500 dark:text-slate-400 text-sm mb-8">Masuk untuk memberi saran atau lapor bug.</p>
 
-            <button id="google-btn" onclick="window.loginGoogle()" class="w-full flex items-center justify-center gap-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 py-4 rounded-2xl font-bold text-slate-700 dark:text-white hover:border-slate-900 dark:hover:border-amber-400 transition-all active:scale-[0.98]">
+            <button id="google-btn" onclick="window.loginGoogle()" class="w-full flex items-center justify-center gap-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 py-4 px-6 rounded-2xl font-bold text-slate-700 dark:text-white hover:border-slate-900 dark:hover:border-amber-400 transition-all active:scale-[0.98] shadow-sm">
                 <svg class="w-5 h-5" viewBox="0 0 24 24">
                     <path fill="#EA4335" d="M12 5.04c1.94 0 3.51.68 4.7 1.81l3.51-3.51C17.91 1.25 15.21 0 12 0 7.31 0 3.25 2.67 1.19 6.6l3.99 3.1c1-2.92 3.73-5.06 6.82-5.06z"/>
                     <path fill="#4285F4" d="M23.49 12.27c0-.79-.07-1.54-.19-2.27H12v4.51h6.47c-.29 1.48-1.14 2.73-2.4 3.58l3.86 3c2.26-2.09 3.56-5.17 3.56-8.82z"/>
                     <path fill="#FBBC05" d="M5.18 14.51c-.25-.74-.4-1.52-.4-2.33s.15-1.59.4-2.33L1.19 6.6C.43 8.15 0 9.88 0 11.71s.43 3.56 1.19 5.11l3.99-3.1z"/>
                     <path fill="#34A853" d="M12 24c3.24 0 5.97-1.09 7.96-2.94l-3.86-3c-1.1.74-2.51 1.17-4.1 1.17-3.09 0-5.82-2.14-6.82-5.06l-3.99 3.1C3.25 21.33 7.31 24 12 24z"/>
                 </svg>
-                <span>Google Login</span>
+                <span>Lanjut dengan Google</span>
             </button>
         </div>
 
         <!-- Feedback Section -->
         <div id="feedback-section" class="hidden">
-            <div class="px-6 pt-6 flex justify-between items-center">
-                <div class="flex items-center gap-2 bg-white/40 dark:bg-slate-800/40 p-1 pr-3 rounded-full border border-white/20">
-                    <img id="user-avatar" class="w-8 h-8 rounded-full border border-white" src="" />
-                    <span id="user-name" class="text-[10px] font-bold text-slate-800 dark:text-white truncate max-w-[80px]">User</span>
+            <div class="px-5 pt-5 flex justify-between items-center">
+                <div class="flex items-center gap-2 bg-white/50 dark:bg-slate-800/60 p-1.5 pr-4 rounded-full border border-white/20">
+                    <img id="user-avatar" class="w-7 h-7 rounded-full border border-white/50 shadow-sm" src="" />
+                    <span id="user-name" class="text-[11px] font-bold text-slate-800 dark:text-white truncate max-w-[100px]">User</span>
                 </div>
-                <button onclick="window.logout()" class="text-slate-400 hover:text-red-500 transition-colors">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7"></path></svg>
+                <button onclick="window.logout()" class="p-2 text-slate-400 hover:text-red-500 transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7"></path></svg>
                 </button>
             </div>
 
-            <div class="px-8 pt-6 pb-2 text-center">
-                <h2 class="text-xl font-extrabold text-slate-900 dark:text-white">Ada Masukan?</h2>
+            <div class="px-8 pt-4 pb-2 text-center">
+                <h2 class="text-xl font-extrabold text-slate-900 dark:text-white leading-tight">Ada Masukan?</h2>
+                <p class="text-slate-400 text-[11px] mt-1 font-medium uppercase tracking-widest">Feedback Anda Berharga</p>
             </div>
 
-            <div id="modal-content" class="px-8 pb-10">
-                <div id="step-1" class="space-y-6">
+            <div id="modal-content" class="px-6 pb-8 sm:px-8">
+                <div id="step-1" class="space-y-5">
                     <!-- Star Rating -->
-                    <div class="flex justify-center gap-1" id="star-container"></div>
-                    <p id="rating-label" class="text-center text-[10px] font-bold uppercase tracking-widest text-slate-400">Pilih Bintang</p>
-
-                    <!-- Category -->
-                    <div class="flex justify-center gap-2">
-                        <button onclick="window.setCategory(this)" class="category-chip px-4 py-2 rounded-xl text-[9px] font-bold">BUG</button>
-                        <button onclick="window.setCategory(this)" class="category-chip px-4 py-2 rounded-xl text-[9px] font-bold">SARAN</button>
-                        <button onclick="window.setCategory(this)" class="category-chip px-4 py-2 rounded-xl text-[9px] font-bold">LAINNYA</button>
+                    <div class="flex justify-center gap-1 sm:gap-2" id="star-container"></div>
+                    
+                    <!-- Category Selection (Scrollable on small mobile) -->
+                    <div class="flex justify-between gap-2 overflow-x-auto pb-1">
+                        <button onclick="window.setCategory(this)" class="category-chip px-3 py-2.5 rounded-xl text-[10px] font-extrabold uppercase tracking-tight">Bug</button>
+                        <button onclick="window.setCategory(this)" class="category-chip px-3 py-2.5 rounded-xl text-[10px] font-extrabold uppercase tracking-tight">Saran</button>
+                        <button onclick="window.setCategory(this)" class="category-chip px-3 py-2.5 rounded-xl text-[10px] font-extrabold uppercase tracking-tight">Lainnya</button>
                     </div>
 
-                    <div class="relative">
-                        <textarea id="feedback-text" rows="3" maxlength="300" 
-                            class="w-full bg-var-input-bg border border-slate-200 dark:border-slate-700 dark:bg-slate-800/50 dark:text-white rounded-2xl p-4 text-xs outline-none focus:border-slate-900 dark:focus:border-amber-400 transition-all resize-none shadow-inner" 
-                            placeholder="Ceritakan kendala Anda..."></textarea>
-                        <div class="absolute bottom-3 right-4 text-[9px] font-bold text-slate-300">
+                    <!-- Text Area -->
+                    <div class="relative group">
+                        <textarea id="feedback-text" rows="4" maxlength="300" 
+                            class="w-full bg-slate-100/50 dark:bg-slate-800/50 border-2 border-transparent dark:text-white rounded-2xl p-4 text-sm outline-none focus:border-slate-900 dark:focus:border-amber-400 transition-all resize-none shadow-inner placeholder:text-slate-400" 
+                            placeholder="Ceritakan detail kendala atau saran Anda..."></textarea>
+                        <div class="absolute bottom-3 right-4 text-[10px] font-bold text-slate-300 pointer-events-none">
                             <span id="char-count">0</span>/300
                         </div>
                     </div>
 
+                    <!-- Submit Button -->
                     <button id="submit-btn" onclick="window.submitFeedback()" disabled 
-                        class="w-full bg-slate-900 dark:bg-amber-400 dark:text-slate-900 text-white font-bold py-4 rounded-2xl shadow-lg text-[10px] uppercase tracking-widest disabled:opacity-20 active:scale-95 transition-all">
+                        class="w-full bg-slate-900 dark:bg-amber-400 dark:text-slate-900 text-white font-extrabold py-4 rounded-2xl shadow-xl text-[11px] uppercase tracking-[0.2em] disabled:opacity-20 active:scale-95 transition-all">
                         Kirim Feedback
                     </button>
                 </div>
 
                 <!-- Success State -->
-                <div id="step-2" class="hidden text-center py-6 space-y-4 animate-fade-in">
-                    <div class="w-16 h-16 bg-emerald-500 rounded-2xl mx-auto flex items-center justify-center text-white shadow-lg">
-                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                <div id="step-2" class="hidden text-center py-8 space-y-4 animate-slide-up">
+                    <div class="w-20 h-20 bg-emerald-500 rounded-[2rem] mx-auto flex items-center justify-center text-white shadow-2xl rotate-3">
+                        <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
                     </div>
-                    <h3 class="text-lg font-bold text-slate-900 dark:text-white">Terkirim! 🚀</h3>
-                    <p class="text-slate-500 dark:text-slate-400 text-[11px]">Terima kasih atas dukungannya.</p>
-                    <button onclick="window.resetForm()" class="text-[10px] font-bold text-slate-400 hover:text-slate-900 dark:hover:text-white uppercase tracking-widest transition-colors">Tutup</button>
+                    <div class="space-y-1">
+                        <h3 class="text-xl font-extrabold text-slate-900 dark:text-white">Berhasil Terkirim!</h3>
+                        <p class="text-slate-500 dark:text-slate-400 text-sm">Terima kasih atas waktu Anda.</p>
+                    </div>
+                    <button onclick="window.resetForm()" class="mt-4 px-6 py-2 rounded-full border border-slate-200 dark:border-slate-700 text-[10px] font-bold text-slate-400 hover:text-slate-900 dark:hover:text-white uppercase tracking-widest transition-all active:scale-90">Kirim Lagi</button>
                 </div>
             </div>
         </div>
@@ -202,9 +223,19 @@
 
         window.loginGoogle = async () => {
             const btn = document.getElementById('google-btn');
+            const originalContent = btn.innerHTML;
             btn.innerHTML = '<div class="spinner"></div>';
-            try { await signInWithPopup(auth, provider); } 
-            catch (e) { alert("Login gagal."); btn.innerHTML = '<span>Google Login</span>'; }
+            btn.disabled = true;
+            try { 
+                await signInWithPopup(auth, provider); 
+            } catch (e) { 
+                console.error(e);
+                btn.innerHTML = originalContent;
+                btn.disabled = false;
+                if (e.code !== 'auth/popup-closed-by-user') {
+                    alert("Login gagal. Silakan coba lagi.");
+                }
+            }
         };
 
         window.logout = () => signOut(auth);
@@ -216,27 +247,30 @@
                 document.getElementById('user-name').innerText = user.displayName;
                 document.getElementById('user-avatar').src = user.photoURL;
                 window.currentUser = user;
+                window.resetForm();
             }
         });
     </script>
 
     <script>
-        // Theme Toggle Logic
+        // Theme Toggle
         function toggleTheme() {
             document.documentElement.classList.toggle('dark');
             localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
         }
-        if (localStorage.getItem('theme') === 'dark') document.documentElement.classList.add('dark');
+        if (localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        }
 
         let currentRating = 0;
         let currentCategory = 'Umum';
 
-        // Stars
+        // Stars Generation
         const container = document.getElementById('star-container');
         for(let i=1; i<=5; i++) {
             container.innerHTML += `
-                <button onclick="window.setRating(${i})" class="star-btn">
-                    <svg class="w-8 h-8 fill-current" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                <button onclick="window.setRating(${i})" class="star-btn outline-none">
+                    <svg class="w-9 h-9 sm:w-10 sm:h-10 fill-current" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
                 </button>`;
         }
 
@@ -260,35 +294,39 @@
             document.getElementById('step-1').classList.remove('hidden');
             document.getElementById('step-2').classList.add('hidden');
             document.getElementById('feedback-text').value = '';
+            document.getElementById('char-count').innerText = '0';
             document.querySelectorAll('.star-btn').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.category-chip').forEach(c => c.classList.remove('active'));
             currentRating = 0;
+            currentCategory = 'Umum';
             document.getElementById('submit-btn').disabled = true;
+            document.getElementById('submit-btn').innerText = "Kirim Feedback";
         };
 
         window.submitFeedback = async () => {
             const user = window.currentUser;
             const btn = document.getElementById('submit-btn');
-            const messageText = document.getElementById('feedback-text').value || "Tidak ada pesan.";
-            btn.innerHTML = '<div class="spinner mx-auto"></div>';
+            const messageText = document.getElementById('feedback-text').value.trim() || "Tidak ada pesan.";
             
-            // Membuat visualisasi bintang
+            btn.innerHTML = '<div class="spinner mx-auto"></div>';
+            btn.disabled = true;
+            
             const starStr = "⭐".repeat(currentRating) + "🌑".repeat(5 - currentRating);
 
             const payload = {
-                content: "🚀 **Feedback Baru Diterima!**",
+                content: "🚀 **Feedback Mobile Baru!**",
                 embeds: [{
                     title: "Rincian Masukan",
-                    color: 0xFBBF24, // Warna Amber
+                    color: 0xFBBF24,
                     fields: [
-                        { name: "👤 Nama Pengguna", value: user.displayName, inline: true },
-                        { name: "📧 Email", value: user.email || "Email Tersembunyi", inline: true },
-                        { name: "🌟 Rating", value: `${starStr} (${currentRating}/5)`, inline: false },
+                        { name: "👤 Pengguna", value: `**${user.displayName}**\n${user.email}`, inline: true },
+                        { name: "🌟 Rating", value: `${starStr} (${currentRating}/5)`, inline: true },
                         { name: "🏷️ Kategori", value: `\`${currentCategory}\``, inline: true },
-                        { name: "📅 Waktu", value: new Date().toLocaleString('id-ID'), inline: true },
+                        { name: "📅 Waktu", value: new Date().toLocaleString('id-ID', {timeZone: 'Asia/Jakarta'}), inline: true },
                         { name: "💬 Pesan", value: `\`\`\`${messageText}\`\`\``, inline: false }
                     ],
                     thumbnail: { url: user.photoURL },
-                    footer: { text: "Sistem Feedback Otomatis" },
+                    footer: { text: `Device: Mobile UI • ID: ${user.uid.slice(0,8)}` },
                     timestamp: new Date().toISOString()
                 }]
             };
@@ -304,12 +342,12 @@
                     document.getElementById('step-1').classList.add('hidden');
                     document.getElementById('step-2').classList.remove('hidden');
                 } else {
-                    throw new Error("Gagal mengirim ke Discord");
+                    throw new Error();
                 }
             } catch (e) {
-                alert("Gagal mengirim feedback. Silakan periksa koneksi Anda.");
-            } finally {
+                alert("Gagal mengirim. Coba lagi dalam beberapa saat.");
                 btn.innerText = "Kirim Feedback";
+                btn.disabled = false;
             }
         };
     </script>
