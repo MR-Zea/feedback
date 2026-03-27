@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Premium Feedback UI - Auth Integrated</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+        
+        :root {
+            --primary: #0f172a;
+            --accent: #fbbf24;
+            --success: #10b981;
+            --google: #4285F4;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: radial-gradient(circle at top left, #f1f5f9 0%, #e2e8f0 100%);
+            min-height: 100vh;
+        }
+
+        .main-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.08);
+        }
+
+        .star-btn {
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            color: #cbd5e1;
+        }
+
+        .star-btn.active {
+            color: var(--accent);
+            filter: drop-shadow(0 0 8px rgba(251, 191, 36, 0.5));
+            transform: scale(1.15);
+        }
+
+        .category-chip {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .category-chip.active {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 10px 15px -3px rgba(15, 23, 42, 0.3);
+            transform: translateY(-2px);
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0.9) opacity: 0; }
+            100% { transform: scale(1) opacity: 1; }
+        }
+
+        .animate-pop {
+            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body class="flex items-center justify-center p-6">
+
+    <div class="main-card w-full max-w-md rounded-[3rem] overflow-hidden animate-pop">
+        
+        <!-- Auth Section (Login/Register) -->
+        <div id="auth-section" class="px-10 py-12">
+            <div class="text-center mb-10">
+                <h2 id="auth-title" class="text-3xl font-extrabold text-slate-900 tracking-tight mb-2">Masuk</h2>
+                <p id="auth-subtitle" class="text-slate-500 text-sm font-medium">Silakan masuk untuk mengirim masukan.</p>
+            </div>
+
+            <div class="space-y-4">
+                <!-- Google Login Button -->
+                <button id="google-btn" onclick="window.loginGoogle()" class="w-full flex items-center justify-center gap-3 bg-white border border-slate-200 py-4 rounded-2xl font-bold text-slate-700 hover:bg-slate-50 transition-all shadow-sm">
+                    <svg class="w-5 h-5" viewBox="0 0 24 24">
+                        <path fill="#EA4335" d="M12 5.04c1.94 0 3.51.68 4.7 1.81l3.51-3.51C17.91 1.25 15.21 0 12 0 7.31 0 3.25 2.67 1.19 6.6l3.99 3.1c1-2.92 3.73-5.06 6.82-5.06z"/>
+                        <path fill="#4285F4" d="M23.49 12.27c0-.79-.07-1.54-.19-2.27H12v4.51h6.47c-.29 1.48-1.14 2.73-2.4 3.58l3.86 3c2.26-2.09 3.56-5.17 3.56-8.82z"/>
+                        <path fill="#FBBC05" d="M5.18 14.51c-.25-.74-.4-1.52-.4-2.33s.15-1.59.4-2.33L1.19 6.6C.43 8.15 0 9.88 0 11.71s.43 3.56 1.19 5.11l3.99-3.1z"/>
+                        <path fill="#34A853" d="M12 24c3.24 0 5.97-1.09 7.96-2.94l-3.86-3c-1.1.74-2.51 1.17-4.1 1.17-3.09 0-5.82-2.14-6.82-5.06l-3.99 3.1C3.25 21.33 7.31 24 12 24z"/>
+                    </svg>
+                    Lanjutkan dengan Google
+                </button>
+
+                <div class="flex items-center gap-4 py-2">
+                    <div class="flex-1 h-px bg-slate-200"></div>
+                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Atau Email</span>
+                    <div class="flex-1 h-px bg-slate-200"></div>
+                </div>
+
+                <!-- Email Form -->
+                <div class="space-y-3">
+                    <input type="email" id="login-email" placeholder="Email" class="w-full px-5 py-4 rounded-2xl bg-slate-50 border border-slate-100 outline-none focus:border-slate-900 transition-all text-sm">
+                    <input type="password" id="login-pass" placeholder="Password" class="w-full px-5 py-4 rounded-2xl bg-slate-50 border border-slate-100 outline-none focus:border-slate-900 transition-all text-sm">
+                    
+                    <button id="email-primary-btn" onclick="window.handleEmailAuth()" class="w-full bg-slate-900 text-white font-bold py-4 rounded-2xl hover:bg-black transition-all text-sm uppercase tracking-widest shadow-lg shadow-slate-200">Masuk</button>
+                    
+                    <p id="auth-toggle-text" class="text-center text-[10px] text-slate-400">
+                        Belum punya akun? <a href="javascript:void(0)" onclick="window.toggleAuthMode()" class="text-slate-900 font-bold underline">Daftar</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Feedback Section (Hidden by default) -->
+        <div id="feedback-section" class="hidden">
+            <div class="px-10 pt-10 flex justify-between items-center">
+                <div class="flex items-center gap-3">
+                    <img id="user-avatar" class="w-8 h-8 rounded-full bg-slate-200 border border-white shadow-sm" src="https://ui-avatars.com/api/?name=User" />
+                    <span id="user-name" class="text-[10px] font-bold text-slate-900 truncate max-w-[100px]">Username</span>
+                </div>
+                <button onclick="window.logout()" class="text-[10px] font-bold text-red-500 uppercase tracking-widest hover:opacity-70">Logout</button>
+            </div>
+
+            <div class="px-10 pt-6 pb-4 text-center">
+                <h2 class="text-2xl font-extrabold text-slate-900 tracking-tight">Kirim Masukan</h2>
+            </div>
+
+            <div id="modal-content" class="px-10 pb-12">
+                <div id="step-1" class="space-y-8">
+                    <!-- Star Rating -->
+                    <div class="space-y-3">
+                        <div class="flex justify-center gap-1" id="star-container">
+                            <!-- Stars generated by JS -->
+                        </div>
+                        <div id="rating-label" class="text-center text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Pilih Bintang</div>
+                    </div>
+
+                    <!-- Category -->
+                    <div class="flex flex-wrap justify-center gap-2">
+                        <button onclick="window.setCategory(this)" class="category-chip px-5 py-2.5 rounded-xl border border-slate-200 text-[10px] font-extrabold text-slate-500 hover:border-slate-400">BUG</button>
+                        <button onclick="window.setCategory(this)" class="category-chip px-5 py-2.5 rounded-xl border border-slate-200 text-[10px] font-extrabold text-slate-500 hover:border-slate-400">SARAN</button>
+                        <button onclick="window.setCategory(this)" class="category-chip px-5 py-2.5 rounded-xl border border-slate-200 text-[10px] font-extrabold text-slate-500 hover:border-slate-400">LAINNYA</button>
+                    </div>
+
+                    <textarea id="feedback-text" rows="4" maxlength="300" 
+                        class="w-full bg-slate-50 border border-slate-100 rounded-2xl p-4 text-sm outline-none focus:border-slate-900 transition-all resize-none" 
+                        placeholder="Detail masukan Anda..."></textarea>
+
+                    <button id="submit-btn" onclick="window.submitFeedback()" disabled 
+                        class="w-full bg-slate-900 text-white font-bold py-5 rounded-[2rem] shadow-xl text-xs uppercase tracking-widest disabled:opacity-20 transition-all">
+                        Kirim Sekarang
+                    </button>
+                </div>
+
+                <div id="step-2" class="hidden text-center py-10 space-y-6">
+                    <div class="bg-emerald-500 w-20 h-20 rounded-full flex items-center justify-center mx-auto text-white shadow-lg">
+                        <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                    </div>
+                    <h3 class="text-2xl font-black text-slate-900">Terkirim!</h3>
+                    <button onclick="window.resetForm()" class="px-8 py-3 rounded-2xl bg-slate-100 text-slate-900 text-xs font-black uppercase tracking-widest">Kembali</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAqzcvKcqAmRmHqUS6fumlyGgxPO8O2c3Y",
+            authDomain: "zea-team.firebaseapp.com",
+            projectId: "zea-team",
+            storageBucket: "zea-team.firebasestorage.app",
+            messagingSenderId: "122346941502",
+            appId: "1:122346941502:web:9986957727b3086dd2756f",
+            measurementId: "G-Q7P6GNXED7"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const provider = new GoogleAuthProvider();
+
+        let isLoginMode = true;
+
+        window.toggleAuthMode = () => {
+            isLoginMode = !isLoginMode;
+            document.getElementById('auth-title').innerText = isLoginMode ? 'Masuk' : 'Daftar';
+            document.getElementById('auth-subtitle').innerText = isLoginMode ? 'Silakan masuk untuk mengirim masukan.' : 'Buat akun baru untuk mulai memberi feedback.';
+            document.getElementById('email-primary-btn').innerText = isLoginMode ? 'Masuk' : 'Daftar';
+            document.getElementById('auth-toggle-text').innerHTML = isLoginMode 
+                ? 'Belum punya akun? <a href="javascript:void(0)" onclick="window.toggleAuthMode()" class="text-slate-900 font-bold underline">Daftar</a>'
+                : 'Sudah punya akun? <a href="javascript:void(0)" onclick="window.toggleAuthMode()" class="text-slate-900 font-bold underline">Masuk</a>';
+        };
+
+        window.loginGoogle = async () => {
+            const btn = document.getElementById('google-btn');
+            const originalHTML = btn.innerHTML;
+            btn.innerHTML = '<div class="spinner border-slate-400 border-t-slate-900 mx-auto"></div>';
+            
+            try {
+                await signInWithPopup(auth, provider);
+            } catch (error) {
+                console.error("Firebase Auth Error:", error);
+                if (error.code === 'auth/unauthorized-domain') {
+                    alert("Domain ini belum diizinkan di Firebase Console.\n\nCara memperbaiki:\n1. Buka Firebase Console > Authentication > Settings\n2. Klik 'Authorized Domains'\n3. Tambahkan domain pratinjau ini.");
+                } else {
+                    alert("Gagal login Google: " + error.message);
+                }
+            } finally {
+                btn.innerHTML = originalHTML;
+            }
+        };
+
+        window.handleEmailAuth = async () => {
+            const email = document.getElementById('login-email').value;
+            const pass = document.getElementById('login-pass').value;
+            const btn = document.getElementById('email-primary-btn');
+            
+            if (!email || !pass) return alert("Harap isi email dan password");
+            
+            btn.innerHTML = '<div class="spinner mx-auto"></div>';
+            btn.disabled = true;
+
+            try {
+                if (isLoginMode) {
+                    await signInWithEmailAndPassword(auth, email, pass);
+                } else {
+                    await createUserWithEmailAndPassword(auth, email, pass);
+                }
+            } catch (error) {
+                alert(error.message);
+            } finally {
+                btn.innerText = isLoginMode ? 'Masuk' : 'Daftar';
+                btn.disabled = false;
+            }
+        };
+
+        window.logout = () => signOut(auth);
+
+        onAuthStateChanged(auth, (user) => {
+            const authSec = document.getElementById('auth-section');
+            const feedSec = document.getElementById('feedback-section');
+            if (user) {
+                authSec.classList.add('hidden');
+                feedSec.classList.remove('hidden');
+                document.getElementById('user-name').innerText = user.displayName || user.email.split('@')[0];
+                document.getElementById('user-avatar').src = user.photoURL || `https://ui-avatars.com/api/?name=${user.email}&background=random`;
+                window.currentUser = user;
+            } else {
+                authSec.classList.remove('hidden');
+                feedSec.classList.add('hidden');
+                window.currentUser = null;
+            }
+        });
+    </script>
+
+    <script>
+        const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1487071889892311112/z4IuG7uHgD_FDDV6vIcv8Vsf6807ySoJrIALS7UEYYKY7hmve--jAoaFwSBhF3s8npGQ';
+        const DISCORD_USER_ID = '1342761437256486994';
+
+        let currentRating = 0;
+        let currentCategory = 'Umum';
+
+        const container = document.getElementById('star-container');
+        if (container) {
+            for(let i=1; i<=5; i++) {
+                container.innerHTML += `
+                    <button onclick="window.setRating(${i})" class="star-btn p-1">
+                        <svg class="w-10 h-10 fill-current" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                    </button>
+                `;
+            }
+        }
+
+        const ratingLabels = {
+            1: { label: "Buruk Sekali", color: "text-red-500" },
+            2: { label: "Kurang", color: "text-orange-500" },
+            3: { label: "Biasa", color: "text-amber-500" },
+            4: { label: "Puas", color: "text-emerald-500" },
+            5: { label: "Luar Biasa", color: "text-emerald-600" }
+        };
+
+        window.setRating = (val) => {
+            currentRating = val;
+            document.querySelectorAll('.star-btn').forEach((s, i) => s.classList.toggle('active', i < val));
+            const label = document.getElementById('rating-label');
+            if (label && ratingLabels[val]) {
+                label.innerText = ratingLabels[val].label;
+                label.className = `text-center text-[10px] font-black uppercase tracking-[0.2em] ${ratingLabels[val].color}`;
+            }
+            const submitBtn = document.getElementById('submit-btn');
+            if (submitBtn) submitBtn.disabled = false;
+        };
+
+        window.setCategory = (el) => {
+            document.querySelectorAll('.category-chip').forEach(c => c.classList.remove('active'));
+            el.classList.add('active');
+            currentCategory = el.innerText;
+        };
+
+        window.resetForm = () => {
+            currentRating = 0;
+            document.getElementById('step-1').classList.remove('hidden');
+            document.getElementById('step-2').classList.add('hidden');
+            document.getElementById('feedback-text').value = '';
+            document.querySelectorAll('.star-btn').forEach(s => s.classList.remove('active'));
+            document.getElementById('submit-btn').disabled = true;
+        };
+
+        window.submitFeedback = async () => {
+            const user = window.currentUser;
+            if(!user) return alert("Silakan login dulu");
+
+            const btn = document.getElementById('submit-btn');
+            const originalText = btn.innerText;
+            btn.innerHTML = '<div class="spinner mx-auto"></div>';
+            btn.disabled = true;
+            
+            const payload = {
+                content: `🔔 **FEEDBACK BARU** untuk <@${DISCORD_USER_ID}>`,
+                embeds: [{
+                    title: "🌟 User Feedback",
+                    color: 0x0f172a,
+                    fields: [
+                        { name: "👤 Pengguna", value: `**${user.displayName || user.email.split('@')[0]}**\n(${user.email})`, inline: true },
+                        { name: "⭐ Rating", value: "⭐".repeat(currentRating), inline: true },
+                        { name: "📁 Kategori", value: currentCategory, inline: true },
+                        { name: "💬 Pesan", value: `\`\`\`${document.getElementById('feedback-text').value || "-"}\`\`\`` }
+                    ],
+                    thumbnail: { url: user.photoURL || "" },
+                    timestamp: new Date().toISOString()
+                }]
+            };
+
+            try {
+                const response = await fetch(DISCORD_WEBHOOK_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                
+                if (response.ok) {
+                    document.getElementById('step-1').classList.add('hidden');
+                    document.getElementById('step-2').classList.remove('hidden');
+                } else {
+                    throw new Error("Gagal mengirim ke Discord");
+                }
+            } catch (e) {
+                console.error(e);
+                alert("Gagal kirim masukan. Coba lagi nanti.");
+            } finally {
+                btn.innerText = originalText;
+                btn.disabled = false;
+            }
+        };
+    </script>
+</body>
+</html>
